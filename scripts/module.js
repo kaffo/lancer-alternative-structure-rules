@@ -99,7 +99,7 @@ async function insertHullCheckButton(state) {
   let show_button = false;
   const roll = state.data.result?.roll.total;
   const structure = state.data.remStruct;
-  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+  if (!roll) throw new TypeError(`Structure check hasn't been rolled yet!`);
 
   switch (roll) {
     case 1:
@@ -138,7 +138,7 @@ async function insertSecondaryRollButton(state) {
 
   const roll = state.data.result?.roll.total;
   const structure = state.data.remStruct;
-  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+  if (!roll) throw new TypeError(`Structure check hasn't been rolled yet!`);
 
   switch (roll) {
     case 1:
