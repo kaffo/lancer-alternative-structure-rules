@@ -97,9 +97,11 @@ async function insertHullCheckButton(state) {
   }
 
   let show_button = false;
-  const roll = state.data.result?.roll.total;
+  const result = state.data.result?.roll.total;
+  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+
+  const roll = result.roll.total;
   const structure = state.data.remStruct;
-  if (!roll) throw new TypeError(`Structure check hasn't been rolled yet!`);
 
   switch (roll) {
     case 1:
@@ -110,7 +112,7 @@ async function insertHullCheckButton(state) {
       }
   }
 
-  let one_count = roll.terms[0].results.filter((v) => v.result === 1).length;
+  let one_count = result.terms[0].results.filter((v) => v.result === 1).length;
 
   if (show_button || one_count > 1) {
     state.data.embedButtons = state.data.embedButtons || [];
@@ -136,9 +138,11 @@ async function insertSecondaryRollButton(state) {
     return false;
   }
 
-  const roll = state.data.result?.roll.total;
+  const result = state.data.result?.roll.total;
+  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+
+  const roll = result.roll.total;
   const structure = state.data.remStruct;
-  if (!roll) throw new TypeError(`Structure check hasn't been rolled yet!`);
 
   switch (roll) {
     case 1:
