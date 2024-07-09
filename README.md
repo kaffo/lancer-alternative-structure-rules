@@ -9,6 +9,12 @@
 
 Uses [Maria's Alternative Structure](https://docs.google.com/document/d/1unN3HDDeAK3pN1rmgFgZgAXp5flnQ9-KMu-TXt34tnU/edit) for Lancer.
 
+# Credits
+
+* cswendrowski/League-of-Foundry-Developers - The template this is based on
+* Eranziel & collaborators - Lancer System & some of the copied over code required to modify
+* BadIdeasBureau - The v10 implementation of the same module, which gave a little inspiration
+
 ## Changelog
 
 * 0.1.0
