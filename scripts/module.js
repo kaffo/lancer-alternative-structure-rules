@@ -33,7 +33,7 @@ function structTableDescriptions(roll, remStruct) {
   return "";
 }
 
-export async function altRollStructure(state) {
+async function altRollStructure(state) {
   if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
   const actor = state.actor;
   if (!actor.is_mech() && !actor.is_npc()) {
@@ -87,7 +87,90 @@ export async function altRollStructure(state) {
   return true;
 }
 
-Hooks.once("ready", async function () {
-  game.lancer.flowSteps.delete("rollStructureTable");
-  game.lancer.flowSteps.set("rollStructureTable", altRollStructure);
+async function insertHullCheckButton(state) {
+  if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
+
+  let actor = state.actor;
+  if (!actor.is_mech() && !actor.is_npc()) {
+    ui.notifications.warn("Only npcs and mechs can roll structure.");
+    return false;
+  }
+
+  let show_button = false;
+  const roll = state.data.result?.roll.total;
+  const structure = state.data.remStruct;
+  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+
+  switch (roll) {
+    case 1:
+      switch (structure) {
+        case 1:
+        case 2:
+          show_button = true;
+      }
+  }
+
+  let one_count = roll.terms[0].results.filter((v) => v.result === 1).length;
+
+  if (show_button || one_count > 1) {
+    state.data.embedButtons = state.data.embedButtons || [];
+    state.data.embedButtons.push(`<a
+        class="flow-button lancer-button"
+        data-flow-type="check"
+        data-check-type="hull"
+        data-actor-id="${actor.uuid}"
+      >
+        <i class="fas fa-dice-d20 i--sm"></i> HULL
+      </a>`);
+  }
+  return true;
+}
+
+async function insertSecondaryRollButton(state) {
+  if (!state.data || !state.data)
+    throw new TypeError(`Structure roll flow data missing!`);
+
+  let actor = state.actor;
+  if (!actor.is_mech() && !actor.is_npc()) {
+    ui.notifications.warn("Only npcs and mechs can roll structure.");
+    return false;
+  }
+
+  const roll = state.data.result?.roll.total;
+  const structure = state.data.remStruct;
+  if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
+
+  switch (roll) {
+    case 1:
+      switch (structure) {
+        case 1:
+        case 2:
+          show_button = true;
+      }
+    case 2:
+    case 3:
+    case 4:
+      show_button = true;
+  }
+
+  if (show_button) {
+    state.data.embedButtons = state.data.embedButtons || [];
+    state.data.embedButtons.push(`<a
+        class="flow-button lancer-button"
+        data-flow-type="secondaryStructure"
+        data-actor-id="${actor.uuid}"
+      >
+        <i class="fas fa-dice-d6 i--sm"></i> TEAR OFF
+      </a>`);
+  }
+  return true;
+}
+
+Hooks.once("lancer.registerFlows", (flowSteps, flows) => {
+  flowSteps.set("rollStructureTable", altRollStructure);
+  flowSteps.set("structureInsertHullCheckButton", insertHullCheckButton);
+  flowSteps.set(
+    "structureInsertSecondaryRollButton",
+    insertSecondaryRollButton
+  );
 });
