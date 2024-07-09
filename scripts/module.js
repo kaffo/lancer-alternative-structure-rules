@@ -111,6 +111,7 @@ async function insertHullCheckButton(state) {
           show_button = true;
           break;
       }
+      break;
   }
 
   let one_count = roll.terms[0].results.filter((v) => v.result === 1).length;
@@ -154,6 +155,7 @@ async function insertSecondaryRollButton(state) {
           show_button = true;
           break;
       }
+      break;
     case 2:
     case 3:
     case 4:
