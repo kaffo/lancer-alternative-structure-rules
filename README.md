@@ -12,4 +12,4 @@ Uses [Maria's Alternative Structure](https://docs.google.com/document/d/1unN3HDD
 ## Changelog
 
 * 0.0.1
-** Initial Release
+    * Initial Release
