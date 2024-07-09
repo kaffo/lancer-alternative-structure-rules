@@ -12,14 +12,13 @@ function structTableDescriptions(roll, remStruct) {
   switch (roll) {
     // Used for multiple ones
     case 0:
-      "";
-      return "Your mech is damaged beyond repair – it is destroyed. You may still exit it as normal.";
+      return "Roll a HULL check. On a success, until the end of your next turn, your mech cannot take its standard move, reactions, or free actions of any kind, including protocols, and during your next turn, you can only take 1 quick action. On a Failure, your mech is immediately destroyed.";
     case 1:
       switch (remStruct) {
         case 2:
-          return "Roll a HULL check. On a success, your mech is @Compendium[world.status-items.Stunned] until the end of your next turn. On a failure, your mech is destroyed.";
+          return "Roll a HULL check. On a success, your mech is @Compendium[world.status-items.Impaired] and @Compendium[world.status-items.Slowed] until the end of your next turn. On a failure, you take the SYSTEM TRAUMA result from this table, and your mech is @Compendium[world.status-items.Impaired] and @Compendium[world.status-items.Immobilized] until the end of your next turn. If there are no valid systems or weapons remaining, this result becomes a CRUSHING HIT instead.";
         case 1:
-          return "Your mech is destroyed.";
+          return "You take the SYSTEM TRAUMA result from this table and must roll a HULL check. On a success, your mech is @Compendium[world.status-items.Impaired] and @Compendium[world.status-items.Slowed] until the end of your next turn. On a Failure, Your mech is @Compendium[world.status-items.Stunned] until the end of your next turn. If there are no valid weapons or systems remaining, this result becomes a CRUSHING HIT instead.";
         default:
           return "Your mech is @Compendium[world.status-items.Stunned] until the end of your next turn.";
       }
@@ -36,7 +35,56 @@ function structTableDescriptions(roll, remStruct) {
 
 export async function altRollStructure(state) {
   if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
-  ui.notifications.warn("This is Alternative Structure.");
+  const actor = state.actor;
+  if (!actor.is_mech() && !actor.is_npc()) {
+    ui.notifications.warn("Only npcs and mechs can roll structure.");
+    return false;
+  }
+
+  if (
+    (state.data?.reroll_data?.structure ?? actor.system.structure.value) >=
+    actor.system.structure.max
+  ) {
+    ui.notifications.info(
+      "The mech is at full Structure, no structure check to roll."
+    );
+    return false;
+  }
+
+  let remStruct =
+    state.data?.reroll_data?.structure ?? actor.system.structure.value;
+  let damage = actor.system.structure.max - remStruct;
+  let formula = `${damage}d6kl1`;
+  // If it's an NPC with legendary, change the formula to roll twice and keep the best result.
+  if (
+    actor.is_npc() &&
+    actor.items.some((i) =>
+      ["npcf_legendary_ultra", "npcf_legendary_veteran"].includes(i.system.lid)
+    )
+  ) {
+    formula = `{${formula}, ${formula}}kh`;
+  }
+  let roll = await new Roll(formula).evaluate({ async: true });
+
+  let result = roll.total;
+  if (result === undefined) return false;
+
+  state.data = {
+    type: "structure",
+    title: structTableTitles[result],
+    desc: structTableDescriptions(result, remStruct),
+    remStruct: remStruct,
+    val: actor.system.structure.value,
+    max: actor.system.structure.max,
+    roll_str: roll.formula,
+    result: {
+      roll: roll,
+      tt: await roll.getTooltip(),
+      total: (roll.total ?? 0).toString(),
+    },
+  };
+
+  return true;
 }
 
 Hooks.once("ready", async function () {
