@@ -33,7 +33,7 @@ function structTableDescriptions(roll, remStruct) {
   return "";
 }
 
-getRollCount = (roll, num_to_count) => {
+const getRollCount = (roll, num_to_count) => {
   return roll
     ? roll.terms[0].results.filter((v) => v.result === num_to_count).length
     : 0;
