@@ -33,6 +33,12 @@ function structTableDescriptions(roll, remStruct) {
   return "";
 }
 
+getRollCount = (roll, num_to_count) => {
+  return roll
+    ? roll.terms[0].results.filter((v) => v.result === num_to_count).length
+    : 0;
+};
+
 async function altRollStructure(state) {
   if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
   const actor = state.actor;
@@ -87,6 +93,28 @@ async function altRollStructure(state) {
   return true;
 }
 
+async function checkMultipleOnes(state) {
+  if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
+
+  let actor = state.actor;
+  if (!actor.is_mech() && !actor.is_npc()) {
+    ui.notifications.warn("Only npcs and mechs can roll structure.");
+    return false;
+  }
+
+  const roll = state.data.result?.roll;
+  if (!roll) throw new TypeError(`Structure check hasn't been rolled yet!`);
+
+  // Crushing hits
+  let one_count = getRollCount(roll, 1);
+  if (one_count > 1) {
+    state.data.title = structTableTitles[0];
+    state.data.desc = structTableDescriptions(0, 1);
+  }
+
+  return true;
+}
+
 async function insertHullCheckButton(state) {
   if (!state.data) throw new TypeError(`Structure roll flow data missing!`);
 
@@ -114,7 +142,7 @@ async function insertHullCheckButton(state) {
       break;
   }
 
-  let one_count = roll.terms[0].results.filter((v) => v.result === 1).length;
+  let one_count = getRollCount(roll, 1);
 
   if (show_button || one_count > 1) {
     state.data.embedButtons = state.data.embedButtons || [];
@@ -178,6 +206,7 @@ async function insertSecondaryRollButton(state) {
 
 Hooks.once("lancer.registerFlows", (flowSteps, flows) => {
   flowSteps.set("rollStructureTable", altRollStructure);
+  flowSteps.set("checkStructureMultipleOnes", checkMultipleOnes);
   flowSteps.set("structureInsertHullCheckButton", insertHullCheckButton);
   flowSteps.set(
     "structureInsertSecondaryRollButton",
