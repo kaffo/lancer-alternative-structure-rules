@@ -26,15 +26,6 @@
           "minimum": "2.0.0"
         }
       }
-    ],
-    "requires": [
-      {
-        "id": "lib-wrapper",
-        "type": "module",
-        "compatibility": {
-          "minimum": "1.0.0.0"
-        }
-      }
     ]
   },
   "system": [
