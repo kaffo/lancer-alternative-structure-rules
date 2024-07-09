@@ -11,5 +11,7 @@ Uses [Maria's Alternative Structure](https://docs.google.com/document/d/1unN3HDD
 
 ## Changelog
 
-* 0.0.1
-    * Initial Release
+* 0.1.0
+    * Initial release candidate
+    * Rules provided by [Maria's Alternative Structure](https://docs.google.com/document/d/1unN3HDDeAK3pN1rmgFgZgAXp5flnQ9-KMu-TXt34tnU/edit)
+    * Currently supports all structure cases except not having any systems left on a `System Trauma` case, however this isn't supported by the base game anyway.
