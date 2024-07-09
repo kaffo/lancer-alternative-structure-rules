@@ -141,6 +141,7 @@ async function insertSecondaryRollButton(state) {
   const result = state.data.result;
   if (!result) throw new TypeError(`Structure check hasn't been rolled yet!`);
 
+  let show_button = false;
   const roll = result.roll;
   const structure = state.data.remStruct;
 
